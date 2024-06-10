@@ -1,3 +1,5 @@
+using Contracts;
+using Microsoft.AspNetCore.Mvc;
 using MiddlewareExample.Extensions;
 using NLog;
 
@@ -19,9 +21,17 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 
 builder.Services.AddAutoMapper(typeof(Program));
 
+builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
+
 //builder.Services.AddControllers();
 
 var app = builder.Build();
+
+var logger = app.Services.GetRequiredService<ILoggerManager>(); 
+app.ConfigureExceptionHandler(logger); 
+
+if (app.Environment.IsProduction()) 
+    app.UseHsts();
 
 // Configure the HTTP request pipeline.
 
