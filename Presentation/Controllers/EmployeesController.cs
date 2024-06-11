@@ -19,13 +19,14 @@ namespace Presentation.Controllers
             return Ok(employees);
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("{id:guid}", Name = "GetEmployeeForCompany")]
         public IActionResult GetEmployeeForCompany(Guid companyId, Guid id)
         {
             var employee = _service.EmployeeService.GetEmployee(companyId, id, trackChanges: false);
             return Ok(employee);
         }
 
+        [HttpPost]
         public IActionResult CreateEmployeeForCompany(Guid companyId, 
             [FromBody] EmployeeForCreationDto employee) 
         { 
@@ -34,6 +35,13 @@ namespace Presentation.Controllers
             
             return CreatedAtRoute("GetEmployeeForCompany", 
                 new { companyId, id = employeeToReturn.Id }, employeeToReturn); 
+        }
+
+        [HttpDelete("{id:guid}")]
+        public IActionResult DeleteEmployeeForCompany(Guid companyId, Guid id)
+        {
+            _service.EmployeeService.DeleteEmployeeForCompany(companyId, id, trackChanges: false);
+            return NoContent();
         }
     }
 }

@@ -14,6 +14,8 @@ namespace MiddlewareExample
             
             CreateMap<Employee, EmployeeDto>();
 
+            CreateMap<EmployeeForCreationDto, Employee>();
+
             CreateMap<CompanyForCreationDto, Company>();
         }
     }
