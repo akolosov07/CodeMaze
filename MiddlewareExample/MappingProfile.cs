@@ -17,6 +17,10 @@ namespace MiddlewareExample
             CreateMap<EmployeeForCreationDto, Employee>();
 
             CreateMap<CompanyForCreationDto, Company>();
+
+            CreateMap<EmployeeForUpdateDto, Employee>().ReverseMap();
+
+            CreateMap<CompanyForUpdateDto, Company>();
         }
     }
 }
