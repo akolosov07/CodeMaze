@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 using MiddlewareExample.Extensions;
 using NLog;
+using Presentation.ActionFilters;
 
 NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() => 
     new ServiceCollection().AddLogging().AddMvc()
@@ -17,13 +18,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
+builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddControllers(
     config => { 
         config.RespectBrowserAcceptHeader = true; 
         config.ReturnHttpNotAcceptable = true; 
         config.InputFormatters.Insert(0, GetJsonPatchInputFormatter()); 
     })
-    .AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly); ;
+    .AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly); 
 
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
