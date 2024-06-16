@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -5,6 +6,8 @@ using Microsoft.Extensions.Options;
 using MiddlewareExample.Extensions;
 using NLog;
 using Presentation.ActionFilters;
+using Service.DataShaping;
+using Shared.DataTransferObjects;
 
 NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() => 
     new ServiceCollection().AddLogging().AddMvc()
@@ -19,6 +22,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.AddScoped<ValidationFilterAttribute>();
+builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
+builder.Services.ConfigureVersioning();
+builder.Services.ConfigureResponseCaching();
+builder.Services.AddMemoryCache();
+builder.Services.ConfigureRateLimitingOptions(); 
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddAuthentication(); 
+builder.Services.ConfigureIdentity();
+builder.Services.ConfigureJWT(builder.Configuration);
+
 builder.Services.AddControllers(
     config => { 
         config.RespectBrowserAcceptHeader = true; 
@@ -52,6 +66,7 @@ if (app.Environment.IsProduction())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 /*app.Use(async (context, next) => 
@@ -83,5 +98,7 @@ app.Run(async context =>
 });*/
 
 app.MapControllers();
+app.UseResponseCaching();
+app.UseIpRateLimiting();
 
 app.Run();
